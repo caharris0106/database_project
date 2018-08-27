@@ -1,14 +1,19 @@
 <!doctype html>
 <h1> Books Id Like to Read
-  <button id="b_about" type="button">About<button>
+  <a href="about"><button id="b_about" type="button">About</button></a>
 </h1>
 <body>
   <form>
     <fieldset align='center'>
       <legend>Click To get Started</legend>
-      <button type='button'>Log In</button><br>
-      <button type='button'>Register</button><br>
-      <button type='button'>Log In as Guest</button><br>
+
+      <a href="login">
+        <button id='log_in' type='button'>Log In</button><br>
+      </a>
+      <a href='register'>
+        <button id="log_in_r" type='button'>Register</button><br>
+      </a>
+      <button id="log_in_g" type='button'>Log In as Guest</button><br>
       <link rel="stylesheet" href="static/styles.css">
     </fieldset>
   </form>
