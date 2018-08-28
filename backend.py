@@ -1,9 +1,11 @@
 from flask import Flask, flash, redirect, request, url_for, session, logging
 from flask import render_template, request
 from wtforms import Form
+import requests
 import sqlite3
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
+import random
 
 app = Flask(__name__)
 
@@ -61,11 +63,16 @@ class UserDB():
     def find_user(self, username, password):
         conn = sqlite3.connect("users.db")
         cur = conn.cursor()
-        result = cur.execute("SELECT * FROM users WHERE username=?",(username,)).fetchone()
+        result = cur.execute("SELECT password FROM users WHERE username=?",(username,)).fetchone()
         if result:
-            return sha256_crypt.verify(password, result[3])
+            return sha256_crypt.verify(password, result[0])#[3])
         else:
             return False
+
+    def make_books_db(self):
+        conn = sqlite3.connect("user.db")
+        cur = conn.cursor()
+        cur.execute("CREATE TABLE IF NOT EXISTS books (id INT, username TEXT, email TEXT, books Text, authors, glink Text)")
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -90,6 +97,7 @@ def register():
 
 @app.route("/login", methods=['GET','POST'])
 def login():
+    session.clear()
     form = LoginForm(request.form)
     if request.method == 'POST':
         # Get Form Fields:
@@ -99,29 +107,56 @@ def login():
         password_candidate = form.password.data
         db = UserDB()
         if db.find_user(username, password_candidate):
-            return redirect(url_for('home'))
+            session['logged_in'] = True
+            session['username'] = username
+            flash("Logged in as {}!".format(username))
+            return redirect(url_for('dashboard'))
         else:
             flash('Invalid Username Or Password')
 
     return render_template('login.html', form=form)
 
+# @app.route("/test")
+# def test():
+#     if session['logged_in']:
+#         return session.username
+
 @app.route("/")
 def home():
-    return render_template('home.html')
+    return render_template('home.html', books=requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
+            random.choice('abcdefghijklmnopqrstuvwxzy') +
+             "&maxResults=40&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json())
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template('dashboard.html', session=session)
 
 @app.route("/about")
 def about():
     return render_template('about.html')
 
+@app.route("/logout")
+def logout():
+    session.clear()
+    return render_template('home.html', books=requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
+            random.choice('abcdefghijklmnopqrstuvwxzy') +
+             "&maxResults=40&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json())
+
 if __name__ == '__main__':
     app.secret_key = 'secret123'
     app.run(debug=True)
-    username='doorman'
-    conn = sqlite3.connect("users.db")
-    cur = conn.cursor()
-    check_existing = cur.execute("SELECT * FROM users").fetchall()
-
-    print(check_existing)
+    books = requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
+            random.choice('abcdefghijklmnopqrstuvwxzy') +
+             "&maxResults=40&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json()
+    # print(type(books.json()['items']))
+    for x in books:
+        print(x)
+    # username='doorman'
+    # conn = sqlite3.connect("users.db")
+    # cur = conn.cursor()
+    # check_existing = cur.execute("SELECT * FROM users").fetchall()
+    #
+    # print(check_existing)
     # x = sha256_crypt.verify('llabtoof', rows)
 
 # g_api='AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8'
