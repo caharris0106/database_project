@@ -2,19 +2,29 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<h1>LOGIN PAGE</h1>
-  <body>
-    <div class="login">
-      <form method='post' action=''>
-        <fieldset align='center'>
-          <legend>Type Username and Password</legend>
-          <p> Username: <p>
-          <input type='text' name='uname'><br>
-          <p> Password:</p>
-          <input type='text' name='password'><br>
-          <input type="submit" value="Submit">
-        </fieldset>
-      </form>
+<h1>Login</h1>
+{% from "includes/_formhelpers.html" import render_field %}
+  <!-- <body> -->
+  <!-- <div class="login"> -->
+  <form method='POST' action=''>
+    <div class="form-group">
+      {{render_field(form.username, class_="form-control")}}
     </div>
-  </body>
+    <div class="form-group">
+      {{render_field(form.password, class_="form-control")}}
+    </div>
+    <div>
+    <p><input type="submit" class='btn btn-primary' value="Submit"></p>
+    </div>
+    <!-- <fieldset align='center'>
+      <legend>Type Username and Password</legend>
+      <p> Username: <p>
+      <input type='text' name='uname' required><br>
+      <p> Password:</p>
+      <input type='text' name='password' required><br>
+      <input type="submit" value="Submit">
+    </fieldset> -->
+  </form>
+  <!-- </div> -->
+  <!-- </body> -->
 {% endblock %}

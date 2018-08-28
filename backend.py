@@ -28,8 +28,15 @@ class RegisterForm(Form):
     ])
     confirm = PasswordField('Confirm Password')
 
+class LoginForm(Form):
+
+    #Choice of Username
+    username = StringField('username', [validators.Length(min=4, max=25)])
+    # Choice of Password
+    password = PasswordField('Password', [validators.InputRequired()])
+
 class UserDB():
-    """Here We want to Create the User Database"""
+    # Create users Table if not already there
     def __init__(self):
         conn = sqlite3.connect('users.db')
         cursor = conn.cursor()
@@ -37,6 +44,7 @@ class UserDB():
         conn.commit()
         conn.close()
 
+    # Find Out if the registering user already has an account, registers them if they dont
     def new_user(self, username, email, password, name):
         conn = sqlite3.connect("users.db")
         cur = conn.cursor()
@@ -47,11 +55,9 @@ class UserDB():
             conn.close()
             return True
         else:
-            # cur.execute("INSERT INTO users VALUES (NULL, ?,?,?,?)",(username, email, password, name))
             return False
-        # conn.commit()
-        # conn.close()
 
+    # Finds the user for the login page, verifies the password
     def find_user(self, username, password):
         conn = sqlite3.connect("users.db")
         cur = conn.cursor()
@@ -60,8 +66,6 @@ class UserDB():
             return sha256_crypt.verify(password, result[3])
         else:
             return False
-
-
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -86,19 +90,20 @@ def register():
 
 @app.route("/login", methods=['GET','POST'])
 def login():
+    form = LoginForm(request.form)
     if request.method == 'POST':
         # Get Form Fields:
-        username = request.form.get('uname')
-        password_candidate = request.form.get('password')
+        # username = request.form.get('uname')
+        # password_candidate = request.form.get('password')
+        username = form.username.data
+        password_candidate = form.password.data
         db = UserDB()
         if db.find_user(username, password_candidate):
             return redirect(url_for('home'))
         else:
-            flash('Invalid Username')
+            flash('Invalid Username Or Password')
 
-
-
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 @app.route("/")
 def home():
@@ -114,8 +119,7 @@ if __name__ == '__main__':
     username='doorman'
     conn = sqlite3.connect("users.db")
     cur = conn.cursor()
-    check_existing = cur.execute("SELECT * FROM users").fetchall()# WHERE username=?",(username,)).fetchall()
-    # WHERE username=?",(username,))
+    check_existing = cur.execute("SELECT * FROM users").fetchall()
 
     print(check_existing)
     # x = sha256_crypt.verify('llabtoof', rows)
