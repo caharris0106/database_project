@@ -1,0 +1,16 @@
+<!doctype html>
+
+{% extends 'layout.html' %}
+
+{% block body %}
+  <div class='jumbotron text-center'>
+    <h1>Welcome to Books Id Like to Read</h1>
+    <p class='lead'>This App lets you search for books and email yourself a list</p>
+  </div>
+  <div class='search'>
+    <fieldset>
+      Search:<br>
+      <input type="text" name="search" value="Search For a Book">
+      <input type="submit" name="submit" value="Go!">
+    </fieldset>
+{% endblock %}

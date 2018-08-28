@@ -1,8 +1,11 @@
 <!doctype html>
+{% extends 'layout.html' %}
+
+{% block body %}
 <h1>LOGIN PAGE</h1>
   <body>
-    <div class="login_form">
-      <form method='post' action='/backend.py'>
+    <div class="login">
+      <form method='post' action=''>
         <fieldset align='center'>
           <legend>Type Username and Password</legend>
           <p> Username: <p>
@@ -14,3 +17,4 @@
       </form>
     </div>
   </body>
+{% endblock %}
