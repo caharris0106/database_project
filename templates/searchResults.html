@@ -1,12 +1,8 @@
 <!doctype html>
 
-{% extends 'layout.html' %}
-
-{% block body %}
-  <div class='jumbotron text-center'>
-    <h1>Welcome to Books Id Like to Read</h1>
-    <p class='lead'>This App lets you search for books and email yourself a list</p>
-  </div>
+{% extends 'search.html' %}
+  {% block upperbody %}
+  {% if books['totalItems'] != 0 %}
 
   {% for book in books['items'] %}
 
@@ -15,26 +11,27 @@
     <div class="card-header">
       <h2 class='card-title'>{{ book.volumeInfo.title }}</h2>
     </div>
-    <div class="card-header">
-      <p class='card-title'>{{ book.volumeInfo.authors }}</p>
-    </div>
     <div class=card-img-left>
     {% if book.volumeInfo.imageLinks %}
       <img class="card-img" src={{ book.volumeInfo.imageLinks.smallThumbnail }}>
     {% endif %}
     </div>
-    <div class=card-footer>
-      {{ book.volumeInfo.infoLink }}
-    </div>
     <div class="card">
       <!-- <h5 class="card-title">{{ book.volumeInfo.title }}</h5> -->
       <p class="card-text">{{book.volumeInfo.description}}</p>
       {% if session.logged_in %}
-      <a href="#" class="btn btn-primary">Add to List</a>
+      <a href="{{ url_for('redir', title=book.volumeInfo.title, author=book.volumeInfo.authors, googleID=book.id) }}" class="btn btn-primary">Add to List</a>
+
       {% else %}
-      <a href="#" class="btn btn-primary">Login to Add to List</a>
+      <a href="/login" class="btn btn-primary">Login to Add to List</a>
       {% endif %}
     </div>
   </div>
   {% endfor %}
-{% endblock %}
+  {% else %}
+  <div class="no_results">
+    <p>No Results</p>
+  </div>
+  {% endif %}
+
+  {% endblock %}

@@ -7,6 +7,8 @@
             <span class="icon-bar"></span>
             <span class='icon-bar'></span>
             <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+
           </button>
           <a href="/" class="navbar-brand">Books Id like to Read</a>
         </div>
@@ -15,11 +17,12 @@
             <li><a href="/">Home</a></li>
             <li><a href="/about">About</a></li>
             <li><a href='/login'>Login</a></li>
+            <li><a href='/search'>Search Books</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
               <!-- <li><a href='/register'>Register</a></li> -->
               {% if session.logged_in %}
-              <li>Logged in as {{session.username}}</li>
+              <li>Logged in as {{session.username}}</>
               <li><a href="/dashboard">Dashboard</a></li>
               <li><a href="/logout">Logout</a></li>
               {% else %}

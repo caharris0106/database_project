@@ -1,0 +1,28 @@
+<!doctype html>
+
+{% extends 'layout.html' %}
+{% block body %}
+
+<div class="card text-center" >
+
+  <form action="{{ url_for('search') }}" method="post">
+
+    <fieldset>
+      Search:<br>
+
+      <input type="text" name="title" id="title" placeholder="Search For a Title" type="text" required><br>
+      <input type="text" name="author" id="author" placeholder="Search For an Author" type="text"><br>
+      <input type="text" name="isbn" id='isbn' placeholder="Search For a ISBN" type="text"><br>
+
+    </fieldset>
+
+    <br><button class="btn" type="submit" value="Submit">Search</button>
+
+  </form>
+
+</div>
+<div class='container'>
+  {% block upperbody %}{% endblock %}
+</div>
+
+{% endblock %}

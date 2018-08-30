@@ -7,4 +7,13 @@
   <div class='container'>
     <h2>Your Books</h2>
   </div>
+  {% for item in books['items'] %}
+
+  <div>
+    <div>Book: {{item['book']}}</div>
+    <div>Author(s): {{item.authors}}</div>
+    <div>GoogleID: {{item.googleID}}</div>
+  </div><br><br>
+  {% endfor %}
+
 {% endblock %}
