@@ -1,0 +1,35 @@
+<!doctype html>
+
+{% extends 'layout.html' %}
+
+{% block body %}
+{% if session.logged_in %}
+<h1>Account Details</h1>
+<div class='jumbotron text-center'>
+  <h1>Account Details</h1>
+  <p class='Username:'>Username: {{session.username}}</p>
+  <p class='Email:'>Username: {{session.email}}</p>
+</div>
+<div class='jumbotron text-center'>
+  <h1>Change Password</h1>
+  {% from "includes/_formhelpers.html" import render_field %}
+  <form method='POST' action=''>
+    <div class="form-group">
+      {{render_field(form.password_old, class_="form-control")}}
+    </div>
+    <div class="form-group">
+      {{render_field(form.password_new, class_="form-control")}}
+    </div>
+    <div class="form-group">
+      {{render_field(form.confirm_new, class_="form-control")}}
+    </div>
+
+    <div>
+    <p><input type="submit" class='btn btn-primary' value="Submit"></p>
+    </div>
+  </form>
+</div>
+{% else %}
+<h1>Login To View Account Details</h1>
+{% endif %}
+{% endblock %}

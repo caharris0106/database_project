@@ -14,21 +14,27 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav navbar-left">
+            {% if session.logged_in %}
             <li><a href="/">Home</a></li>
             <li><a href="/about">About</a></li>
-            <li><a href='/login'>Login</a></li>
             <li><a href='/search'>Search Books</a></li>
           </ul>
+            {% else %}
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href='/search'>Search Books</a></li>
+            <li><a href='/login'>Login</a></li>
+            {% endif %}
           <ul class="nav navbar-nav navbar-right">
               <!-- <li><a href='/register'>Register</a></li> -->
-              {% if session.logged_in %}
-              <li>Logged in as {{session.username}}</>
-              <li><a href="/dashboard">Dashboard</a></li>
-              <li><a href="/logout">Logout</a></li>
-              {% else %}
-              <li><a href="/register">Register</a></li>
-              <!-- <li><a href="/login">Login</a></li> -->
-              {% endif %}
+            {% if session.logged_in %}
+            <li><a href="/dashboard">Logged in as {{session.username}}</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/logout">Logout</a></li>
+            {% else %}
+            <li><a href="/register">Register</a></li>
+            <!-- <li><a href="/login">Login</a></li> -->
+            {% endif %}
           </ul>
         </div><!--/.nav-collapse -->
       </div>

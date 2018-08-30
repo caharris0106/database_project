@@ -8,11 +8,13 @@ from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 import random
 import json
+import os
+
 g_api='AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8'
 
 app = Flask(__name__)
 mail = Mail(app)
-
+app.secret_key = os.urandom(24)
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'booklistsender1000@gmail.com'
@@ -48,6 +50,23 @@ class LoginForm(Form):
     username = StringField('username', [validators.Length(min=4, max=25)])
     # Choice of Password
     password = PasswordField('Password', [validators.InputRequired()])
+
+class ChangePassForm(Form):
+
+    # Choice of Password
+    password_old = PasswordField('Password', [validators.InputRequired()])
+
+    password_new = PasswordField('Password', [
+    validators.InputRequired(),
+    validators.EqualTo('confirm', message='Passwords dont match')
+    ])
+
+    confirm_new = PasswordField('Confirm Password')
+
+class DeleteAccountForm(Form):
+
+    password = PasswordField('Password', [validators.InputRequired()])
+
 
 class UserDB():
     """This Class deals with registration"""
@@ -85,11 +104,27 @@ class UserDB():
     def grab_info(self, username):
         conn = sqlite3.connect("users.db")
         cur = conn.cursor()
-        # Gets the user id, username, email
         user_row = cur.execute("SELECT id,username,email FROM users where username=?", (username,)).fetchone()
         conn.commit()
         conn.close()
         return user_row
+
+    def update_pass(self, username, new_pass):
+        conn = sqlite3.connect("users.db")
+        cur = conn.cursor()
+        cur.execute("UPDATE users SET password=? WHERE username=?", (new_pass, username))
+        conn.commit()
+        conn.close()
+
+    def delete_account(self, username):
+        conn=sqlite3.connect("users.db")
+        cur = conn.cursor()
+        user_in_db = cur.execute("SELECT * from users WHERE username=?",(username,)).fetchone()
+        if user_in_db!=None:
+            # Insert into Books, id, username, email, book, authors, glink
+            cur.execute("DELETE FROM users WHERE username=?", (username,))
+            conn.commit()
+            conn.close()
 
 class BooksDB():
     '''This Class Deals with the book Table'''
@@ -130,9 +165,7 @@ class BooksDB():
             cur.execute("DELETE FROM books WHERE username=? AND book=?", (username, book))
             conn.commit()
             conn.close()
-            return True
-        else:
-            return False
+
     def create_json(self, username):
         # Return a Json File from books db for display
         conn=sqlite3.connect('users.db')
@@ -143,6 +176,16 @@ class BooksDB():
             books['items'].append(dict(book=book,authors=authors, googleID=googleID))
             books['total'] +=1
         return books
+
+    def delete_account(self, username):
+        conn=sqlite3.connect("users.db")
+        cur = conn.cursor()
+        user_in_books_db = cur.execute("SELECT * from books WHERE username=?",(username,)).fetchone()
+        if user_in_books_db!=None:
+            # Insert into Books, id, username, email, book, authors, glink
+            cur.execute("DELETE FROM books WHERE username=?", (username,))
+            conn.commit()
+            conn.close()
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -178,7 +221,6 @@ def login():
         if db.find_user(username, password_candidate):
             session['logged_in'] = True
             session['username'] = username
-
             flash("Logged in as {}!".format(username))
             return redirect(url_for('dashboard'))
         else:
@@ -201,7 +243,7 @@ def home():
 def search():
 
     if request.method=='POST':
-        
+
         if not request.form.get("title"):
             flash("Enter a title")
 
@@ -231,18 +273,28 @@ def search():
 def searchResults():
     return render_template("searchResults.html")
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
     books = BooksDB().create_json(session['username'])
-    # if request.method == 'POST':
-    #
-    #     msg = Message('Thank you for registration', sender = 'booklistsender1000@gmail.com', recipients = ['caharris0106@gmail.com'])
-    #
-    #     # define content of the email
-    #     msg.body = """Hello and thank you for join us! We hope you enjoy at our site where you can search, read, comment and grade your favourite books. Have fun!"""
-    #
-    #     # send email
-    #     mail.send(msg)
+    email= BooksDB().grab_info(session['username'])[2]
+    session['email'] = email
+    if request.method == 'POST':
+
+        msg = Message('Book List', sender = 'booklistsender1000@gmail.com', recipients = [session['email']])
+
+        message_string = ''
+        for item in books['items']:
+            message_string += 'Book: '+item['book']+'\n'+'Author(s): '+item['authors']+'\n'+'Google ID: '+item['googleID']+'\n\n'
+
+        # define content of the email
+        msg.body = message_string
+
+        # send email
+        mail.send(msg)
+
+        flash("Message Sent")
+        render_template('dashboard.html', session=session, books=books)
+
     return render_template('dashboard.html', session=session, books=books)
 
 @app.route("/about")
@@ -260,6 +312,55 @@ def redir(title, author, googleID):
     book_db.insert_book(user_id, session['username'], email, book_title, book_author, book_id)
     return redirect(url_for('dashboard'))
 
+@app.route("/remove_book/<title>")
+def remove_book(title):
+    book_db = BooksDB()
+    username = session['username']
+    book_db.delete_book(title, username)
+    return redirect(url_for('dashboard'))
+#
+# def find_user(self, username, password):
+#     conn = sqlite3.connect("users.db")
+#     cur = conn.cursor()
+#     result = cur.execute("SELECT password FROM users WHERE username=?",(username,)).fetchone()
+#     if result:
+#         return sha256_crypt.verify(password, result[0])#[3])
+#     else:
+#         return False
+@app.route("/accountDetails", methods=['GET', 'POST'])
+def accountDetails():
+    form = ChangePassForm(request.form)
+    if request.method == 'POST':
+        # Get Form Fields:
+        password_old = form.password_old.data
+        password_new = sha256_crypt.encrypt(str(form.password_new.data))
+        db = UserDB()
+        if db.find_user(session['username'], password_old):
+            db.update_pass(session['username'], password_new)
+            flash("Password Changed!")
+            return redirect(url_for('dashboard'))
+        else:
+            flash("Invalid Password")
+
+    return render_template('accountDetails.html', session=session, form=form)
+
+@app.route("/deleteAccount", methods=['GET', 'POST'])
+def deleteAccount():
+    form = DeleteAccountForm(request.form)
+    if request.method == 'POST':
+        # Get Form Fields:
+        password = form.password.data
+        db = UserDB()
+        if db.find_user(session['username'], password):
+            db.delete_account(session['username'])
+            BooksDB().delete_account(session['username'])
+            session.clear()
+            return redirect(url_for('login'))
+        else:
+            flash("Invalid Password")
+    return render_template('deleteAccount.html', session=session, form=form)
+
+
 @app.route("/logout")
 def logout():
     session.clear()
@@ -268,28 +369,18 @@ def logout():
             'computer' +
              "&maxResults=40&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json())
 
-if __name__ == '__main__':
+# catch all other routes that doesn't exist
+@app.errorhandler(404)
+def page_not_found(e):
 
-    app.secret_key = 'secret123'
+    return render_template("pageNotFound.html")
+
+if __name__ == '__main__':
     app.run(debug=True)
-    # conn = sqlite3.connect('users.db')
-    # cur = conn.cursor()
-    # cur.execute("DROP TABLE books")
-    # conn.commit()
-    # conn.close()
-    # book= 'Principles'
-    # book_indb = cur.execute("SELECT * from books WHERE book=?",(book,)).fetchone()
-    # if book_indb==None:
-    #     # Insert into Books, id, username, email, book, authors, glink
-    #     cur.execute("INSERT INTO books VALUES (?,?,?,?,?)", (2, 'a','a',book,'a'))
-    #     conn.commit()
-    #     conn.close()
-    # username='charris52'
-    # conn=sqlite3.connect('users.db')
-    # cur=conn.cursor()
-    # jfile = cur.execute('SELECT book, authors, googleID FROM books WHERE username=?', (username,)).fetchall()
-    # file_test = BooksDB().create_json(username)
-    # print(file_test)
+
+
+
+
     # bks=requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
     #         'a' +
     #         "&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json()

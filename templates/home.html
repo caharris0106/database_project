@@ -8,33 +8,34 @@
     <p class='lead'>This App lets you search for books and email yourself a list</p>
   </div>
 
-  {% for book in books['items'] %}
+{% for book in books['items'] %}
+  {% if book.volumeInfo.authors %}
+    <div class="well well-lg text-center" >
 
-  <div class="card text-center" >
-  <!-- style="width: 200rem;"> -->
-    <div class="card-header">
-      <h2 class='card-title'>{{ book.volumeInfo.title }}</h2>
-    </div>
-    <div class="card-header">
-      <p class='card-title'>{{ book.volumeInfo.authors }}</p>
-    </div>
-    <div class=card-img-left>
-    {% if book.volumeInfo.imageLinks %}
-      <img class="card-img" src={{ book.volumeInfo.imageLinks.smallThumbnail }}>
-    {% endif %}
-    </div>
-    <div class=card-footer>
-      {{ book.volumeInfo.infoLink }}
-    </div>
-    <div class="card">
-      <!-- <h5 class="card-title">{{ book.volumeInfo.title }}</h5> -->
-      <p class="card-text">{{book.volumeInfo.description}}</p>
-      {% if session.logged_in %}
-      <a href="#" class="btn btn-primary">Add to List</a>
-      {% else %}
-      <a href="#" class="btn btn-primary">Login to Add to List</a>
-      {% endif %}
-    </div>
-  </div>
-  {% endfor %}
+          <div>
+              <h2>{{ book.volumeInfo.title }}</h2>
+          </div>
+          {% for author in book.volumeInfo.authors %}
+          <div>
+            <span>{{ author }}</span>
+          </div>
+          {% endfor %}
+          <div>
+            {% if book.volumeInfo.imageLinks %}
+              <img class="card-img" src={{ book.volumeInfo.imageLinks.smallThumbnail }}>
+            {% endif %}
+          </div>
+
+          <div class="card">
+          <!-- <h5 class="card-title">{{ book.volumeInfo.title }}</h5> -->
+            <p class="card-text">{{book.volumeInfo.description}}</p>
+            {% if session.logged_in %}
+            <a href="{{ url_for('redir', title=book.volumeInfo.title, author=book.volumeInfo.authors, googleID=book.id) }}" class="btn btn-primary">Add to List</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-primary">Login to Add to List</a>
+            {% endif %}
+          </div>
+      </div>
+  {% endif %}
+{% endfor %}
 {% endblock %}

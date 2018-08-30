@@ -3,17 +3,33 @@
 {% extends 'layout.html' %}
 
 {% block body %}
+{% if session.logged_in %}
   <h1> <small> Welcome {{ session.username }} </small> </h1>
+  <div>
+  <form class="sub_data" action="" method="post">
+    <button class="btn btn-primary" type="submit" value="Submit">Send My Books</button>
+  </form>
+  <a href='/accountDetails' class="btn btn-primary">Account Details</a><br>
+  <a href='/deleteAccount' class="btn btn-primary">Delete Account</a>
+  </div>
+
   <div class='container'>
     <h2>Your Books</h2>
   </div>
   {% for item in books['items'] %}
+  <div class="border">
 
-  <div>
+  <div class='card text-left'>
     <div>Book: {{item['book']}}</div>
     <div>Author(s): {{item.authors}}</div>
     <div>GoogleID: {{item.googleID}}</div>
-  </div><br><br>
-  {% endfor %}
+    <a href="{{ url_for('remove_book', title=item['book']) }}" class="btn btn-primary">Remove Book</a>
+  </div>
+  </div>
+  <br><br>
 
+  {% endfor %}
+{% else %}
+<h1>Login To View Your Dashboard</h1>
+{% endif %}
 {% endblock %}
