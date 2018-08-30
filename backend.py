@@ -367,8 +367,8 @@ def page_not_found(e):
 
     return render_template("pageNotFound.html")
 
-# if __name__ == '__main__':
-#     app.run()
+if __name__ == '__main__':
+    app.run()
     #debug=True)
 
 
