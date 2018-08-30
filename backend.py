@@ -318,15 +318,7 @@ def remove_book(title):
     username = session['username']
     book_db.delete_book(title, username)
     return redirect(url_for('dashboard'))
-#
-# def find_user(self, username, password):
-#     conn = sqlite3.connect("users.db")
-#     cur = conn.cursor()
-#     result = cur.execute("SELECT password FROM users WHERE username=?",(username,)).fetchone()
-#     if result:
-#         return sha256_crypt.verify(password, result[0])#[3])
-#     else:
-#         return False
+
 @app.route("/accountDetails", methods=['GET', 'POST'])
 def accountDetails():
     form = ChangePassForm(request.form)
@@ -375,14 +367,16 @@ def page_not_found(e):
 
     return render_template("pageNotFound.html")
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run()
+    #debug=True)
 
 
 
-
-    # bks=requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
-    #         'a' +
-    #         "&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json()
-    # print(type(bks))
-    # g_api='AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8'
+    # conn = sqlite3.connect('users.db')
+    # conn.cursor().execute("DROP TABLE users")
+    # conn.cursor().execute("DROP TABLE books")
+    # db=UserDB()
+    # bdb=BooksDB()
+    # conn.commit()
+    # conn.close()
