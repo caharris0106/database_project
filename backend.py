@@ -1,6 +1,7 @@
 from flask import Flask, flash, redirect, request, url_for, session, logging
 from flask import render_template, request
 from flask_mail import Mail, Message
+# from flask-sqalchemy import *
 from wtforms import Form
 import requests
 import sqlite3
@@ -364,19 +365,18 @@ def logout():
 # catch all other routes that doesn't exist
 @app.errorhandler(404)
 def page_not_found(e):
-
     return render_template("pageNotFound.html")
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
     #debug=True)
 
 
 
-    # conn = sqlite3.connect('users.db')
-    # conn.cursor().execute("DROP TABLE users")
-    # conn.cursor().execute("DROP TABLE books")
-    # db=UserDB()
-    # bdb=BooksDB()
-    # conn.commit()
-    # conn.close()
+    conn = sqlite3.connect('users.db')
+    conn.cursor().execute("DROP TABLE users")
+    conn.cursor().execute("DROP TABLE books")
+    db=UserDB()
+    bdb=BooksDB()
+    conn.commit()
+    conn.close()
