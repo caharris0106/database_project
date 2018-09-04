@@ -131,17 +131,8 @@ def login():
     session.clear()
     form = LoginForm(request.form)
     if request.method == 'POST':
-        # Get Form Fields:
         username = form.username.data
         password = form.password.data
-        # db = UserDB()
-        # if db.find_user(username, password_candidate):
-        #     session['logged_in'] = True
-        #     session['username'] = username
-        #     flash("Logged in as {}!".format(username))
-        #     return redirect(url_for('dashboard'))
-        # else:
-        #     flash('Invalid Username Or Password')
         find_username = User.query.filter_by(username=username).first()
         if find_username == None:
             flash("Invalid Username")
@@ -198,10 +189,7 @@ def searchResults():
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
     all_books = Books.query.filter_by(username=session['username']).all()
-    if all_books != None:
-        books = dict(total=0, items=list())
-    else:
-        books = dict()
+    books = dict(total=0, items=list())
     for item in all_books:
         books['items'].append(dict(book=item.book,authors=item.authors, googleID=item.googleID))
         books['total'] +=1
@@ -241,8 +229,6 @@ def redir(title, author, googleID):
     book_title = title
     book_id = googleID
     book_author = author.replace('[','').replace(']','').replace('\'','')
-    # db.session.add(User(name=name, username=username, email=email, password=password))
-    # add_book = Books(id=user_id, username=session['username'], email=email, book=book_title, authors=book_author, googleID=book_id)
     google_id_count = Books.query.filter_by(googleID=book_id).count()
     if google_id_count >0:
         flash("Youve Alread Added That Book")
