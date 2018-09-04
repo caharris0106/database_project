@@ -150,7 +150,7 @@ def login():
 def home():
     return render_template('home.html', books=requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
             'python' +
-             "&maxResults=40&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json())
+             "&maxResults=40&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json(), session=session)
 
 @app.route("/search", methods=["GET","POST"])
 def search():
