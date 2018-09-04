@@ -195,7 +195,7 @@ def dashboard():
         books['items'].append(dict(book=item.book,authors=item.authors, googleID=item.googleID))
         books['total'] +=1
 
-    user = Books.query.filter_by(username=session['username']).first()
+    # user = Books.query.filter_by(username=session['username']).first()
     session['email'] = user.email
 
     if request.method == 'POST':
