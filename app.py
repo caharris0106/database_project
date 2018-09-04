@@ -1,5 +1,4 @@
-from flask import Flask, flash, redirect, request, url_for, session, logging
-from flask import render_template, request
+from flask import Flask, flash, redirect, request, url_for, session, logging, render_template
 from flask_mail import Mail, Message
 from wtforms import Form
 import requests
@@ -12,8 +11,11 @@ import os
 
 g_api='AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8'
 
+# Instantiate flask and flask mail
 app = Flask(__name__)
 mail = Mail(app)
+
+# Configure App for mail, secret_key, and postres URI
 app.secret_key = os.urandom(24)
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
@@ -24,8 +26,10 @@ app.config['MAIL_USE_SSL'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://vmlfkxjbhtupoc:f7eda27955cdafac485d8d163a6b8cae5a9d4bd53a2cef3b29a2645bfe0fda1f@ec2-54-204-46-60.compute-1.amazonaws.com:5432/d99b7oie922v8a'
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:paperclip@localhost:5433/books'
+# Instantiate SQLALCHEMY
 db = SQLAlchemy(app)
-mail = Mail(app)
+
+
 # Class Used to take user input from register.html
 class RegisterForm(Form):
     #Name of Person
@@ -47,6 +51,7 @@ class RegisterForm(Form):
     ])
     confirm = PasswordField('Confirm Password')
 
+# Class for Login Form
 class LoginForm(Form):
 
     #Choice of Username
@@ -54,6 +59,7 @@ class LoginForm(Form):
     # Choice of Password
     password = PasswordField('Password', [validators.InputRequired()])
 
+# WT-Forms Class for Changing Password
 class ChangePassForm(Form):
 
     # Choice of Password
@@ -66,12 +72,19 @@ class ChangePassForm(Form):
 
     confirm_new = PasswordField('Confirm Password')
 
+
+# WT-Forms for Deleteing acount
 class DeleteAccountForm(Form):
 
     password = PasswordField('Password', [validators.InputRequired()])
 
 
+# Class for Object Relational Mapper of user Table
 class User(db.Model):
+    '''
+    'user' table has a name, username, email, password column
+    The first column is a primary key(Integer)
+    '''
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), nullable=False)
     username = db.Column(db.String(256), unique=True, nullable=False)
@@ -81,8 +94,14 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-        # cur.execute("CREATE TABLE IF NOT EXISTS books (id INT, username TEXT, email TEXT, book Text, authors TEXT, googleID TEXT)")
+# Class for Object Relational Mapper for books table
 class Books(db.Model):
+    '''
+    Class Books takes in a user_id, username, email, title of a book,
+    the others of the book, and an ID from google Books
+
+    The first column is the primary key
+    '''
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     username = db.Column(db.String(256), nullable=False)
@@ -97,25 +116,24 @@ class Books(db.Model):
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    '''Registers User With wt-form'''
+
+    # Instantiate wt-form for registration
     form = RegisterForm(request.form)
     if request.method == 'POST' and form.validate():
+        # Take data from the form from register.html
         name = form.name.data
         email = form.email.data
         username = form.username.data
         password = sha256_crypt.encrypt(str(form.password.data))
 
-        # # Make New User
-        # db = UserDB()
-        # if db.new_user(username, email, password, name):
-        #     flash("You Are Now Registered and can Login", "Success")
-        # else:
-        #     flash("Email or Username in Use Already")
-        #     return render_template('register.html', form=form)
-        # return redirect(url_for('login'))
+        # Check if the username or email is already used
         user_count = User.query.filter_by(username=username).count()
         email_count = User.query.filter_by(email=email).count()
 
         if user_count==0 and email_count==0:
+            # If the database doesnt contain the username and email,
+            # Add the information to teh user table
             db.session.add(User(name=name, username=username, email=email, password=password))
             db.session.commit()
             flash("You Are Registered and Can Log In")
@@ -128,19 +146,31 @@ def register():
 
 @app.route("/login", methods=['GET','POST'])
 def login():
+    '''Function To Login a user who is registered'''
+
+    # Clear the Session, No user is logged in
     session.clear()
+
+    # Instantiate wt-form for logging in
     form = LoginForm(request.form)
     if request.method == 'POST':
+
+        # Set variables for form data
         username = form.username.data
         password = form.password.data
+
+        # Checks to see if the user is in the user Table
         find_username = User.query.filter_by(username=username).first()
         if find_username == None:
             flash("Invalid Username")
         else:
-            user_row = User.query.filter_by(username=username).first()
-            if sha256_crypt.verify(password,user_row.password):
+            # Verify Password with passlib
+            if sha256_crypt.verify(password,find_username.password):
+
+                # Logs the User in with flask-session
                 session['logged_in'] = True
                 session['username'] = username
+                # Takes the user to homepage
                 return redirect(url_for('home'))
 
     return render_template('login.html', form=form)
@@ -148,13 +178,14 @@ def login():
 
 @app.route("/")
 def home():
+    ''' Page Displaying Up to 40 Books from google API '''
     return render_template('home.html', books=requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
             'python' +
              "&maxResults=40&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json(), session=session)
 
 @app.route("/search", methods=["GET","POST"])
 def search():
-
+    ''' Main Function for searching for books '''
     if request.method=='POST':
 
         if not request.form.get("title"):
