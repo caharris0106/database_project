@@ -27,6 +27,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://vmlfkxjbhtupoc:f7eda27955cda
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:paperclip@localhost:5433/books'
 db = SQLAlchemy(app)
 db.create_all()
+db.session.commit()
 mail = Mail(app)
 # Class Used to take user input from register.html
 class RegisterForm(Form):
