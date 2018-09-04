@@ -188,7 +188,8 @@ def searchResults():
 
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    all_books = Books.query.filter_by(username=session['username']).all()
+    user = User.query.filter_by(username=session['username']).all()
+    all_books = Books.query.filter_by(username=user.username).all()
     books = dict(total=0, items=list())
     for item in all_books:
         books['items'].append(dict(book=item.book,authors=item.authors, googleID=item.googleID))
