@@ -198,7 +198,10 @@ def searchResults():
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
     all_books = Books.query.filter_by(username=session['username']).all()
-    books = dict(total=0, items=list())
+    if all_books != None:
+        books = dict(total=0, items=list())
+    else:
+        books = dict()
     for item in all_books:
         books['items'].append(dict(book=item.book,authors=item.authors, googleID=item.googleID))
         books['total'] +=1
@@ -222,6 +225,7 @@ def dashboard():
 
         flash("Message Sent")
         render_template('dashboard.html', session=session, books=books)
+
     #
     return render_template('dashboard.html', session=session, books=books)
 
