@@ -16,7 +16,8 @@ app = Flask(__name__)
 mail = Mail(app)
 
 # Configure App for mail, secret_key, and postres URI
-app.config['MAIL_SERVER']='smtp.gmail.com'
+app.secret_key = os.urandom(24)
+app.config['MAIL_SERVER']= 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'booklistsender1000@gmail.com'
 app.config['MAIL_PASSWORD'] = 'Reccos:0106'
@@ -328,5 +329,4 @@ def page_not_found(e):
     return render_template("pageNotFound.html")
 
 if __name__ == '__main__':
-    app.secret_key = os.urandom(24)
     app.run(debug=True)
