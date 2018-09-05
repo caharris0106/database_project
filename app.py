@@ -329,7 +329,9 @@ def deleteAccount():
         # Get Form Fields:
         password = form.password.data
         user = User.query.filter_by(username=session['username']).first()
+        b_user = Books.query.filter_by(username=session['username']).first()
         if sha256_crypt.verify(password, user.password):
+            db.session.delete(b_user)
             db.session.delete(user)
             db.session.commit()
             flash('Account Deleted')
