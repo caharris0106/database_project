@@ -19,7 +19,7 @@ mail = Mail(app)
 # Configure Session
 
 db = SQLAlchemy(app)
-session = Session(app)
+Session(app)
 app.secret_key = os.urandom(24)
 session.init_app(app)
 app.config["SESSION_SQLALCHEMY"] = db
