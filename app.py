@@ -17,7 +17,7 @@ app = Flask(__name__)
 mail = Mail(app)
 
 # Configure Session
-Session(app)
+
 db = SQLAlchemy(app)
 app.config["SESSION_SQLALCHEMY"] = db
 app.config["SESSION_PERMANENT"] = True
@@ -25,7 +25,6 @@ app.config["SESSION_TYPE"] = "sqlalchemy"
 app.config["SESSION_SQLALCHEMY_TABLE"] = 'user'
 app.config["PERMANENT_SESSION_LIFETIME"] = 3600
 app.config["SESSION_COOKIE_SECURE"] = True
-
 
 # Configure App for mail, secret_key, and postres URI
 
@@ -37,6 +36,8 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://vmlfkxjbhtupoc:f7eda27955cdafac485d8d163a6b8cae5a9d4bd53a2cef3b29a2645bfe0fda1f@ec2-54-204-46-60.compute-1.amazonaws.com:5432/d99b7oie922v8a'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+session = Session(app)
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:paperclip@localhost:5433/books'
 # Instantiate SQLALCHEMY
