@@ -19,6 +19,7 @@ mail = Mail(app)
 # Configure Session to be perminant
 app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "sqlalchemy"
+app.config["SESSION_SQLALCHEMY_TABLE"] = 'user'
 app.config["PERMANENT_SESSION_LIFETIME"] = 3600
 app.config["SESSION_COOKIE_SECURE"] = True
 Session(app)
@@ -37,6 +38,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:paperclip@localhost:5433/books'
 # Instantiate SQLALCHEMY
 db = SQLAlchemy(app)
+app.config["SESSION_SQLALCHEMY"] = db
 
 
 # Class Used to take user input from register.html
