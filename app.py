@@ -16,7 +16,10 @@ g_api='AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8'
 app = Flask(__name__)
 mail = Mail(app)
 
-# Configure Session to be perminant
+# Configure Session
+Session(app)
+db = SQLAlchemy(app)
+app.config["SESSION_SQLALCHEMY"] = db
 app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "sqlalchemy"
 app.config["SESSION_SQLALCHEMY_TABLE"] = 'user'
@@ -37,9 +40,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:paperclip@localhost:5433/books'
 # Instantiate SQLALCHEMY
-db = SQLAlchemy(app)
-app.config["SESSION_SQLALCHEMY"] = db
-Session(app)
+
 
 # Class Used to take user input from register.html
 class RegisterForm(Form):
@@ -96,6 +97,8 @@ class User(db.Model):
     'user' table has a name, username, email, password column
     The first column is a primary key(Integer)
     '''
+     __table_args__ = {'extend_existing': True}
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), nullable=False)
     username = db.Column(db.String(256), unique=True, nullable=False)
