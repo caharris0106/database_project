@@ -186,7 +186,7 @@ def login():
         # Checks to see if the user is in the user Table
         find_username = User.query.filter_by(username=username).first()
         if find_username == None:
-            flash("Invalid Username")
+            flash("Invalid Username Or Password")
         else:
             # Verify Password with passlib
             if sha256_crypt.verify(password,find_username.password):
@@ -196,6 +196,8 @@ def login():
                 session['username'] = username
                 # Takes the user to homepage
                 return redirect(url_for('home'))
+            else:
+                flash("Invalid Username Or Password")
 
     return render_template('login.html', form=form)
 
@@ -306,6 +308,7 @@ def remove_book(title):
 @app.route("/accountDetails", methods=['GET', 'POST'])
 def accountDetails():
     form = ChangePassForm(request.form)
+    session['name'] = User.query.filter_by(username=session['username']).first().name
     if request.method == 'POST':
         # Get Form Fields:
         password_old = form.password_old.data
