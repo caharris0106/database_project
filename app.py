@@ -19,6 +19,9 @@ mail = Mail(app)
 # Configure Session
 
 db = SQLAlchemy(app)
+session = Session(app)
+app.secret_key = os.urandom(24)
+session.init_app(app)
 app.config["SESSION_SQLALCHEMY"] = db
 app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "sqlalchemy"
@@ -363,7 +366,6 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    session = Session(app)
-    app.secret_key = os.urandom(24)
-    session.init_app(app)
+
+
     app.run(debug=True)
