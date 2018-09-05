@@ -15,11 +15,10 @@ g_api='AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8'
 # Instantiate flask and flask mail
 app = Flask(__name__)
 mail = Mail(app)
-
+app.secret_key = os.urandom(24)
 # Configure Session
 Session(app)
 db = SQLAlchemy(app)
-app.secret_key = os.urandom(24)
 app.config["SESSION_SQLALCHEMY"] = db
 app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "sqlalchemy"
