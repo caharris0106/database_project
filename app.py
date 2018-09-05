@@ -15,7 +15,7 @@ g_api='AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8'
 # Instantiate flask and flask mail
 app = Flask(__name__)
 mail = Mail(app)
-app.secret_key = os.urandom(24)
+
 # Configure Session
 Session(app)
 db = SQLAlchemy(app)
@@ -362,4 +362,5 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
+    app.secret_key = os.urandom(24)
     app.run(debug=True)
