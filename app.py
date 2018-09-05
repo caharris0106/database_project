@@ -16,11 +16,10 @@ g_api='AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8'
 app = Flask(__name__)
 mail = Mail(app)
 
-# configure session to use filesystem (instead of signed cookies)
+# Configure Session to be perminant
 app.config["SESSION_PERMANENT"] = True
-app.config["SESSION_TYPE"] = "filesystem"
-app.config["PERMANENT_SESSION_LIFETIME"] = 10800
-app.config["SESSION_COOKIE_HTTPONLY"] = False
+app.config["SESSION_TYPE"] = "sqlalchemy"
+app.config["PERMANENT_SESSION_LIFETIME"] = 3600
 app.config["SESSION_COOKIE_SECURE"] = True
 Session(app)
 
