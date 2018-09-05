@@ -16,15 +16,15 @@
               <h2>{{ book.volumeInfo.title }}</h2>
           </div>
           {% if book.volumeInfo.authors %}
-          {% for author in book.volumeInfo.authors %}
-          <div>
-            <span>{{ author }}</span>
-          </div>
-          {% endfor %}
+            {% for author in book.volumeInfo.authors %}
+            <div>
+              <span>{{ author }}</span>
+            </div>
+            {% endfor %}
           {% else %}
-          <div>
-            <span>No Author</span>
-          </div>
+            <div>
+              <span>No Author</span>
+            </div>
           {% endif %}
           <div>
             {% if book.volumeInfo.imageLinks %}
@@ -42,7 +42,7 @@
               <a href="{{ url_for('redir', title=book.volumeInfo.title, author='No Author Listed', googleID=book.id) }}" class="btn btn-primary">Add to List</a>
               {% endif %}
             {% else %}
-            <a href="{{ url_for('login') }}" class="btn btn-primary">Login to Add to List</a>
+              <a href="{{ url_for('login') }}" class="btn btn-primary">Login to Add to List</a>
             {% endif %}
           </div>
       </div>

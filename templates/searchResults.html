@@ -11,6 +11,17 @@
     <div class="card-header">
       <h2 class='card-title'>{{ book.volumeInfo.title }}</h2>
     </div>
+    {% if book.volumeInfo.authors %}
+      {% for author in book.volumeInfo.authors %}
+      <div>
+        <span>{{ author }}</span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div>
+        <span>No Author</span>
+      </div>
+    {% endif %}
     <div class=card-img-left>
     {% if book.volumeInfo.imageLinks %}
       <img class="card-img" src={{ book.volumeInfo.imageLinks.smallThumbnail }}>
@@ -20,10 +31,13 @@
       <!-- <h5 class="card-title">{{ book.volumeInfo.title }}</h5> -->
       <p class="card-text">{{book.volumeInfo.description}}</p>
       {% if session.logged_in %}
-      <a href="{{ url_for('redir', title=book.volumeInfo.title, author=book.volumeInfo.authors, googleID=book.id) }}" class="btn btn-primary">Add to List</a>
-
+        {% if book.volumeInfo.authors %}
+        <a href="{{ url_for('redir', title=book.volumeInfo.title, author=book.volumeInfo.authors, googleID=book.id) }}" class="btn btn-primary">Add to List</a>
+        {% else %}
+        <a href="{{ url_for('redir', title=book.volumeInfo.title, author='No Author Listed', googleID=book.id) }}" class="btn btn-primary">Add to List</a>
+        {% endif %}
       {% else %}
-      <a href="/login" class="btn btn-primary">Login to Add to List</a>
+        <a href="{{ url_for('login') }}" class="btn btn-primary">Login to Add to List</a>
       {% endif %}
     </div>
   </div>
