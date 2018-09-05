@@ -37,7 +37,7 @@ app.config['MAIL_USE_SSL'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://vmlfkxjbhtupoc:f7eda27955cdafac485d8d163a6b8cae5a9d4bd53a2cef3b29a2645bfe0fda1f@ec2-54-204-46-60.compute-1.amazonaws.com:5432/d99b7oie922v8a'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-session = Session(app)
+
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:paperclip@localhost:5433/books'
 # Instantiate SQLALCHEMY
@@ -363,5 +363,6 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
+    session = Session(app)
     app.secret_key = os.urandom(24)
     app.run(debug=True)
