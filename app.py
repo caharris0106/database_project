@@ -228,7 +228,7 @@ def search():
                     request.form.get("title") +
                     "&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json())
 
-    return render_template("search.html")
+    return render_template("search.html", session=session)
 
 @app.route("/searchResults", methods=["GET","POST"])
 def searchResults():
