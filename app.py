@@ -347,7 +347,7 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def internal_service_error(e):
-    return render_template("five_hund", session=session)
+    return render_template("five_hund.html", session=session)
 
 if __name__ == '__main__':
     app.run(debug=True)
