@@ -211,8 +211,9 @@ def search():
     ''' Main Function for searching for books '''
     if request.method=='POST':
 
-        if not request.form.get("title"):
-            flash("Enter a title")
+        if not request.form.get("title") and not request.form.get('author') and not request.form.get('isbn'):
+            flash("Enter a title, author, isbn")
+            return render_template("search.html", session=session)
 
         if request.form.get("author"):
             return render_template("searchResults.html", books = requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
