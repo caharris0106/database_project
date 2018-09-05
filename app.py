@@ -39,8 +39,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Instantiate SQLALCHEMY
 db = SQLAlchemy(app)
 app.config["SESSION_SQLALCHEMY"] = db
-session = Session(app)
-session.app.session_interface.db.create_all()
+Session(app)
 
 # Class Used to take user input from register.html
 class RegisterForm(Form):
