@@ -92,7 +92,7 @@ class User(db.Model):
     email = db.Column(db.String(256), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
 
-    def __init__(self, id, name, username, email, password):
+    def __init__(self, name, username, email, password):
         self.id = id
         self.name = name
         self.username = username
@@ -118,7 +118,7 @@ class Books(db.Model):
     authors = db.Column(db.String(256), nullable=False)
     googleID = db.Column(db.String(256), unique=True, nullable=False)
 
-    def __init__(self, id, user_id, username, email, book, authors, googleID):
+    def __init__(self, user_id, username, email, book, authors, googleID):
         self.id = id
         self.user_id = user_id
         self.username = username
