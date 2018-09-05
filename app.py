@@ -97,7 +97,7 @@ class User(db.Model):
     'user' table has a name, username, email, password column
     The first column is a primary key(Integer)
     '''
-     __table_args__ = {'extend_existing': True}
+
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), nullable=False)
@@ -106,6 +106,7 @@ class User(db.Model):
     password = db.Column(db.String(256), nullable=False)
 
     def __init__(self, name, username, email, password):
+        __table_args__ = {'extend_existing': True}
         self.name = name
         self.username = username
         self.email = email
