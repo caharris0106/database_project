@@ -16,7 +16,6 @@
   <div class='container'>
     <h2>Your Books</h2>
   </div>
-  {% if books %}
   {% for item in books['items'] %}
   <div class="border">
   <div class='card text-left'>
@@ -28,7 +27,6 @@
   </div>
   <br><br>
   {% endfor %}
-  {% endif %}
 
 {% else %}
 <h1>Login To View Your Dashboard</h1>

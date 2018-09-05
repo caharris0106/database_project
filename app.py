@@ -218,7 +218,7 @@ def search():
 def searchResults():
     return render_template("searchResults.html")
 
-@app.route("/dashboard", methods=["GET", "POST"])
+@app.route("/dashboard", methods=["POST"])
 def dashboard():
     user = User.query.filter_by(username=session['username']).first()
     all_books = Books.query.filter_by(username=user.username).all()
