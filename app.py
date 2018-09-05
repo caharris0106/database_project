@@ -269,7 +269,7 @@ def dashboard():
 
 @app.route("/about")
 def about():
-    return render_template('about.html')
+    return render_template('about.html', session=session)
 
 @app.route("/redir/<title>/<author>/<googleID>")
 def redir(title, author, googleID):
