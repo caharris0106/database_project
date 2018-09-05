@@ -16,6 +16,7 @@ g_api='AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8'
 app = Flask(__name__)
 mail = Mail(app)
 
+# Configure session type, and permanence
 app.secret_key = os.urandom(24)
 app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "filesystem"
@@ -141,7 +142,6 @@ class Books(db.Model):
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     '''Registers User With wt-form'''
-
     # Instantiate wt-form for registration
     form = RegisterForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -213,54 +213,61 @@ def home():
 def search():
     ''' Main Function for searching for books '''
     if request.method=='POST':
-
+        # Checks if Any of the inputs are filled and if they are not sends the user a message
         if not request.form.get("title") and not request.form.get('author') and not request.form.get('isbn'):
             flash("Enter a title, author, isbn")
             return render_template("search.html", session=session)
 
+        # Request from Google API for and author and title
         if request.form.get("author"):
             return render_template("searchResults.html", books = requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
                                request.form.get("title") + "+inauthor:" + request.form.get("author") +
                                "&key=AIzaSyBtprivgL2dXOf8kxsMHuELzvOAQn-2ZZM").json())
-
-        if request.form.get("author"):
+        # Request from Google API for and isbn and title
+        if request.form.get("isbn"):
             return render_template("searchResults.html", books = requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
                                request.form.get("title") + "+isbn:" + request.form.get("isbn") +
                                "&key=AIzaSyBtprivgL2dXOf8kxsMHuELzvOAQn-2ZZM").json())
-
-        if request.form.get("author") + request.form.get("isbn"):
+        # Request from Google API for and isbn and title and author
+        if request.form.get("author") and request.form.get("isbn"):
             return render_template("searchResults.html", books = requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
                                request.form.get("title") + "+inauthor:" + request.form.get("author") +
                                "isbn:" + request.form.get("isbn") +
                                "&key=AIzaSyBtprivgL2dXOf8kxsMHuELzvOAQn-2ZZM").json())
-
+        # Request from Google API for title
         return render_template("searchResults.html", books=requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
                     request.form.get("title") +
                     "&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json())
 
+    # If No Search is submitted, template for blank search page is rendered
     return render_template("search.html", session=session)
 
 @app.route("/searchResults", methods=["GET","POST"])
 def searchResults():
+    ''' Function For Rendering template to display all the books from the google API '''
     return render_template("searchResults.html")
 
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    user_name = session['username']
-    user = User.query.filter_by(username = user_name).first()
+    ''' Function to display the users catalog of books '''
+    user = User.query.filter_by(username = session['username']).first()
     all_books = Books.query.filter_by(username = user.username).all()
+
+    # Convert the booklist to a json-type dictionary for display and messaging
     books = dict(total=0, items=list())
     for item in all_books:
         books['items'].append(dict(book=item.book,authors=item.authors, googleID=item.googleID))
         books['total'] +=1
 
-    # user = Books.query.filter_by(username=session['username']).first()
+    # Get email from database and leave it in session
     session['email'] = user.email
 
+    # Sends a message to the users email
     if request.method == 'POST':
 
         msg = Message('Book List', sender = 'booklistsender1000@gmail.com', recipients = [session['email']])
 
+        # Create a Message String for an email to be sent automatically
         message_string = ''
         for item in books['items']:
             message_string += 'Book: '+item['book']+'\n'+'Author(s): '+item['authors']+'\n'+'Google ID: '+item['googleID']+'\n\n'
@@ -274,7 +281,7 @@ def dashboard():
         flash("Message Sent")
         render_template('dashboard.html', session=session, books=books)
 
-    #
+    #Template if no message is sent
     return render_template('dashboard.html', session=session, books=books)
 
 @app.route("/about")
@@ -283,6 +290,12 @@ def about():
 
 @app.route("/redir/<title>/<author>/<googleID>")
 def redir(title, author, googleID):
+    '''
+    This Function takes an html "GET" request of the book selected from google query,
+    then redirects the user to the dashboard. The user is looked up in the 'user'
+    table of the database, some information (user id, email, username) is inserted into
+    the books database along with the selected book title, author, and google ID
+    '''
     user = User.query.filter_by(username=session['username']).first()
     user_id = user.id
     email = user.email
@@ -290,23 +303,32 @@ def redir(title, author, googleID):
     book_id = googleID
     book_author = author.replace('[','').replace(']','').replace('\'','')
     google_id_count = Books.query.filter_by(googleID=book_id).count()
+
+    # Check by googleID if the book is put into the database already
     if google_id_count >0:
         flash("Youve Alread Added That Book")
         return redirect(url_for('dashboard'))
 
     db.session.add(Books(user_id=user_id, username=session['username'], email=email, book=book_title, authors=book_author, googleID=book_id))
     db.session.commit()
-    # book_db.insert_book(user_id, session['username'], email, book_title, book_author, book_id)
     return redirect(url_for('dashboard'))
 
 @app.route("/remove_book/<title>")
 def remove_book(title):
+    '''
+    This function uses an html 'GET' request with the title of a book,
+    and deletes the title from the 'books' table
+    '''
     Books.query.filter_by(book=title).delete()
     db.session.commit()
     return redirect(url_for('dashboard'))
 
 @app.route("/accountDetails", methods=['GET', 'POST'])
 def accountDetails():
+    '''
+    Account Details displays the users name, username, and email,
+    and gives the option to change the password
+    '''
     form = ChangePassForm(request.form)
     session['name'] = User.query.filter_by(username=session['username']).first().name
     if request.method == 'POST':
@@ -348,7 +370,6 @@ def deleteAccount():
 @app.route("/logout")
 def logout():
     session.clear()
-    # random.choice('abcdefghijklmnopqrstuvwxzy')
     return render_template('home.html', books=requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
             'computer' +
              "&maxResults=40&key=AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8").json())
@@ -360,6 +381,4 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-
-
     app.run(debug=True)
