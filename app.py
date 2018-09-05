@@ -19,6 +19,7 @@ mail = Mail(app)
 # Configure Session
 Session(app)
 db = SQLAlchemy(app)
+app.secret_key = os.urandom(24)
 app.config["SESSION_SQLALCHEMY"] = db
 app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "sqlalchemy"
@@ -28,7 +29,7 @@ app.config["SESSION_COOKIE_SECURE"] = True
 
 
 # Configure App for mail, secret_key, and postres URI
-app.secret_key = os.urandom(24)
+
 app.config['MAIL_SERVER']= 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'booklistsender1000@gmail.com'
