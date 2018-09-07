@@ -319,7 +319,7 @@ def remove_book(title):
     This function uses an html 'GET' request with the title of a book,
     and deletes the title from the 'books' table
     '''
-    Books.query.filter_by(book=title).first().delete()
+    Books.query.filter_by(book=title).delete()
     db.session.commit()
     return redirect(url_for('dashboard'))
 
@@ -355,7 +355,7 @@ def deleteAccount():
         # Get Form Fields:
         password = form.password.data
         user = User.query.filter_by(username=session['username']).first()
-        b_user = Books.query.filter_by(username=session['username']).first()
+        b_user = Books.query.filter_by(username=session['username']).all()
         if sha256_crypt.verify(password, user.password):
             db.session.delete(b_user)
             db.session.delete(user)
