@@ -319,7 +319,7 @@ def remove_book(title):
     This function uses an html 'GET' request with the title of a book,
     and deletes the title from the 'books' table
     '''
-    Books.query.filter_by(book=title).delete()
+    Books.query.filter_by(book=title).first().delete()
     db.session.commit()
     return redirect(url_for('dashboard'))
 
