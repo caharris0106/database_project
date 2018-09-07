@@ -357,7 +357,7 @@ def deleteAccount():
         user = User.query.filter_by(username=session['username']).first()
         b_user = Books.query.filter_by(username=session['username']).all()
         if sha256_crypt.verify(password, user.password):
-            db.session.delete(b_user)
+            db.session.delete(user)
             for x in b_user:
                 db.session.delete(x)
             db.session.commit()
