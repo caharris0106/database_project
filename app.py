@@ -302,10 +302,10 @@ def redir(title, author, googleID):
     book_title = title
     book_id = googleID
     book_author = author.replace('[','').replace(']','').replace('\'','')
-    google_id_count = Books.query.filter_by(googleID=book_id).count()
+    username_id_count = Books.query.filter_by(username=session['username']).count()
 
     # Check by googleID if the book is put into the database already
-    if google_id_count >0:
+    if username_id_count > 0:
         flash("Youve Alread Added That Book")
         return redirect(url_for('dashboard'))
 
