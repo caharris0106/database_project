@@ -125,7 +125,7 @@ class Books(db.Model):
     email = db.Column(db.String(256), nullable=False)
     book = db.Column(db.String(256), nullable=False)
     authors = db.Column(db.String(256), nullable=False)
-    googleID = db.Column(db.String(256), unique=True, nullable=False)
+    googleID = db.Column(db.String(256), nullable=False)
 
     def __init__(self, user_id, username, email, book, authors, googleID):
         self.user_id = user_id
