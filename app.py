@@ -358,7 +358,8 @@ def deleteAccount():
         b_user = Books.query.filter_by(username=session['username']).all()
         if sha256_crypt.verify(password, user.password):
             db.session.delete(b_user)
-            db.session.delete(user)
+            for x in b_user:
+                db.session.delete(x)
             db.session.commit()
             flash('Account Deleted')
             return redirect(url_for('login'))
@@ -381,4 +382,4 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
