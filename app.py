@@ -1,6 +1,7 @@
-from flask import Flask, flash, redirect, request, url_for, session, logging, render_template
+from flask import Flask, flash, redirect, request, url_for, session, render_template
 from flask_mail import Mail, Message
 from flask_session import Session
+from flask_sslify import SSLify
 from wtforms import Form
 import requests
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
@@ -14,7 +15,9 @@ g_api='AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8'
 
 # Instantiate flask and flask mail
 app = Flask(__name__)
-mail = Mail(app)
+
+if 'DYNO' in os.environ:
+    sslify = SSLify(app)
 
 # Configure session type, and permanence
 app.secret_key = os.urandom(24)
@@ -22,6 +25,8 @@ app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["PERMANENT_SESSION_LIFETIME"] = 3600
 app.config["SESSION_COOKIE_SECURE"] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://vmlfkxjbhtupoc:f7eda27955cdafac485d8d163a6b8cae5a9d4bd53a2cef3b29a2645bfe0fda1f@ec2-54-204-46-60.compute-1.amazonaws.com:5432/d99b7oie922v8a'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Configure App for mail, secret_key, and postres URI
 app.config['MAIL_SERVER']= 'smtp.gmail.com'
@@ -30,8 +35,7 @@ app.config['MAIL_USERNAME'] = 'booklistsender1000@gmail.com'
 app.config['MAIL_PASSWORD'] = 'Reccos:0106'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://vmlfkxjbhtupoc:f7eda27955cdafac485d8d163a6b8cae5a9d4bd53a2cef3b29a2645bfe0fda1f@ec2-54-204-46-60.compute-1.amazonaws.com:5432/d99b7oie922v8a'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+mail = Mail(app)
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:paperclip@localhost:5433/books'
 # Instantiate SQLALCHEMY
