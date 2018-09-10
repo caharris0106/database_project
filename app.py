@@ -25,7 +25,7 @@ app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["PERMANENT_SESSION_LIFETIME"] = 3600
 app.config["SESSION_COOKIE_SECURE"] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://vmlfkxjbhtupoc:f7eda27955cdafac485d8d163a6b8cae5a9d4bd53a2cef3b29a2645bfe0fda1f@ec2-54-204-46-60.compute-1.amazonaws.com:5432/d99b7oie922v8a'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://qtiraodyxzkezo:120470dec9b9947b2d1ad5b9c4874899667d478a19e87498dda3b7bf7f99c0f1@ec2-54-225-76-201.compute-1.amazonaws.com:5432/de0sa52b8ib9br'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Configure App for mail, secret_key, and postres URI
