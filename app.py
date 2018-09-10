@@ -16,6 +16,7 @@ g_api='AIzaSyAvHykLgaS8U3WrOp48sbNcI_lAtBmLyD8'
 # Instantiate flask and flask mail
 app = Flask(__name__)
 
+# Make sure the connection is secure
 if 'DYNO' in os.environ:
     sslify = SSLify(app)
 
@@ -37,7 +38,6 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:paperclip@localhost:5433/books'
 # Instantiate SQLALCHEMY
 db = SQLAlchemy(app)
 Session(app)
